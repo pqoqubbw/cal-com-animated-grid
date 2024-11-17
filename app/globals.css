@@ -4,6 +4,7 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-color: #f4f4f4;
 }
 
 @layer base {
@@ -59,6 +60,51 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+  }
+
+  .dot-grid {
+    --distance: var(--grid-size, 20px);
+    background-image: radial-gradient(
+      circle at center,
+      var(--dot-color, #d1d5db85) 1px,
+      transparent 0
+    );
+    background-size: var(--distance) var(--distance);
+    background-repeat: repeat;
+  }
+
+  .vertical-fadeout {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 calc(var(--mask-distance, 50px)),
+      #000,
+      #000 calc(100% - var(--mask-distance, 50px)),
+      transparent
+    );
+  }
+  .horizontal-fadeout {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 calc(var(--mask-distance, 50px)),
+      #000,
+      #000 calc(100% - var(--mask-distance, 50px)),
+      transparent
+    );
+  }
+
+  .border-subtle {
+    border-color: var(--cal-border-subtle, #e5e7eb);
+  }
+
+  .radial-fadeout {
+    mask-image: radial-gradient(
+      at center,
+      #000,
+      #000 calc(100% - var(--mask-distance, 150px)),
+      transparent
+    );
   }
 }
 
