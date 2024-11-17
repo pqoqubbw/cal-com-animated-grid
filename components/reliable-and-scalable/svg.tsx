@@ -1,7 +1,11 @@
 'use client';
 
-import { motion, MotionProps, useInView, type Variants } from 'motion/react';
-import { useRef } from 'react';
+import {
+  motion,
+  MotionProps,
+  useReducedMotion,
+  type Variants,
+} from 'motion/react';
 
 const whileHover: MotionProps['whileHover'] = {
   scale: 1.1,
@@ -10,34 +14,40 @@ const whileHover: MotionProps['whileHover'] = {
 
 const barVariants: Variants = {
   hidden: { y: 100, opacity: 0 },
-  visible: (delay: number = 0) => ({
+  visible: ({
+    delay,
+    prefersReducedMotion,
+  }: {
+    delay?: number;
+    prefersReducedMotion: boolean;
+  }) => ({
     y: 0,
     opacity: 1,
-    transition: { delay, duration: 0.5 },
+    transition: prefersReducedMotion
+      ? undefined
+      : { delay: delay || 0, duration: 0.5 },
   }),
 };
 
 const lineVariants: Variants = {
   hidden: { clipPath: 'inset(0 150% 0 0)' },
-  visible: {
+  visible: (prefersReducedMotion: boolean) => ({
     clipPath: 'inset(0 0 0 0)',
-    transition: {
-      duration: 1,
-      delay: 0.5,
-      ease: 'easeInOut',
-    },
-  },
+    transition: prefersReducedMotion
+      ? undefined
+      : {
+          duration: 1,
+          delay: 0.5,
+          ease: 'easeInOut',
+        },
+  }),
 };
 
-const ChartSvg = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true });
+const ChartSvg = ({ isInView }: { isInView: boolean }) => {
+  const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div
-      className="horizontal-fadeout dot-grid flex w-full justify-center overflow-clip"
-      ref={containerRef}
-    >
+    <div className="horizontal-fadeout dot-grid flex w-full justify-center overflow-clip">
       <svg
         className="-mb-12"
         xmlns="http://www.w3.org/2000/svg"
@@ -50,6 +60,7 @@ const ChartSvg = () => {
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
           variants={lineVariants}
+          custom={prefersReducedMotion}
         >
           <path
             fill="#9CA3AF"
@@ -67,7 +78,8 @@ const ChartSvg = () => {
           variants={barVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          whileHover={whileHover}
+          custom={{ delay: 0, prefersReducedMotion }}
+          whileHover={prefersReducedMotion ? undefined : whileHover}
         >
           <rect width="36" height="99" x="5" y="106" fill="#F9FAFB" rx="4" />
           <rect
@@ -83,8 +95,8 @@ const ChartSvg = () => {
           variants={barVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          custom={0.6}
-          whileHover={whileHover}
+          custom={{ delay: 0.6, prefersReducedMotion }}
+          whileHover={prefersReducedMotion ? undefined : whileHover}
         >
           <rect width="36" height="185" x="137" y="20" fill="#F9FAFB" rx="4" />
           <rect
@@ -100,8 +112,8 @@ const ChartSvg = () => {
           variants={barVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          custom={0.2}
-          whileHover={whileHover}
+          custom={{ delay: 0.2, prefersReducedMotion }}
+          whileHover={prefersReducedMotion ? undefined : whileHover}
         >
           <rect width="36" height="123" x="49" y="82" fill="#F9FAFB" rx="4" />
           <rect
@@ -118,8 +130,8 @@ const ChartSvg = () => {
           variants={barVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          custom={0.4}
-          whileHover={whileHover}
+          custom={{ delay: 0.4, prefersReducedMotion }}
+          whileHover={prefersReducedMotion ? undefined : whileHover}
         >
           <rect width="36" height="161" x="93" y="44" fill="#F9FAFB" rx="4" />
           <rect
@@ -136,23 +148,4 @@ const ChartSvg = () => {
   );
 };
 
-const ReliableAndScalable = () => {
-  return (
-    <div className="border-muted group flex flex-col overflow-clip rounded-2xl border bg-white shadow-sm">
-      <div className="p-6">
-        <h3 className="mb-1 text-lg font-medium font-mono">
-          Reliable and scalable
-        </h3>
-        <p className="text-sm font-mono">
-          Cal Atoms are built on the rock-solid scheduling foundation of
-          Cal.com. We&apos;ve scheduled millions of bookings to date.
-        </p>
-      </div>
-      <div className="mt-auto flex items-center justify-center rounded-md">
-        <ChartSvg />
-      </div>
-    </div>
-  );
-};
-
-export { ReliableAndScalable };
+export { ChartSvg };

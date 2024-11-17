@@ -1,95 +1,27 @@
 'use client';
 
-import { motion, useInView } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
-
-const characters =
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>/';
-
-const getRandomChar = () => {
-  return characters.charAt(Math.floor(Math.random() * characters.length));
-};
-
-const MatrixText = ({
-  isInView,
-  text,
-}: {
-  isInView: boolean;
-  text: string;
-}) => {
-  const [displayText, setDisplayText] = useState(text);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    const animate = async () => {
-      if (isInView) {
-        interval = setInterval(() => {
-          setDisplayText((prev) =>
-            prev
-              .split('')
-              .map((_, i) => (Math.random() > 0.95 ? getRandomChar() : prev[i]))
-              .join('')
-          );
-        }, 50);
-      }
-    };
-
-    animate();
-    return () => clearInterval(interval);
-  }, [isInView]);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: isInView ? 0.6 : 0 }}
-      transition={{ duration: 1 }}
-      className="select-none whitespace-pre"
-    >
-      {displayText}
-    </motion.div>
-  );
-};
-
-const CharacterBackground = ({ isInView }: { isInView: boolean }) => {
-  const initialTexts = [
-    '4afgSHaFjxh6ldky0asdfnchg9dsBczFysuhdDhBksuYds6GhfsdfhtyukwrryjMbXs557sdtykyli23457y,nasdrgpoii2345fxxcbhr3h6K',
-    '7HjbnF6dhFJ7vnsgx6FH8doepdF6ietyfh78hdgntdfghb6BFGdnZvweryerqn6HFbYHfnghbHnbc3ysad0p023iopeuk8945tffy62v5X',
-    'hf7reDSFGtdsKnfyjervNqwsdtthy4cvbtyilX76nmffvbgja7fgsdnsdfg7DNfnHnagaweryasdqszxxnvmFmCn5z7878964xP',
-    'jddh6BChdxA34aashFjy98dfaqwerjaexczrgwrtysDdousfgkn7dasdflGpd34kIwrtwertn2bhvgandgteBDsf35Jv67Nbg7Ov',
-    '<XbvC6Chf7xerasqrzXeDSFGtdCBshdtyjewerthggdTFwryuk67dnknfsfgjnuil57>qwer</XbvC6Chf7xerasqrzXeDSFGtdCBshdtyjewerthggdTFwryuk67dnknfsfgjnuil57>ghwqeV5HvcaqWjg8990dzsQewzCb',
-    '0fahvn6fxsadfasfsxascxxkgj8yh65mBKGkshrtyukwwerylXoPhggtasshdfgsjT543sbhbVNMCPjgfSOvL8kvYzc',
-    '7HjvnDuIxp87tasw345adfertyjasdfYReqWasdfcvn7JFGlsk9dmaCXdSaqPzs46xcvhktyirtyfg467xxv7nBHUnfv',
-    'hNBgd5JBK87MvnXzrrhhytyjuiolyyfj8Pkgj60dfFzaawdqwet578o0[r,tus4wEshwxn28nbhjsd8nfFgnbZ90db',
-  ];
-
-  return (
-    <div className="radial-fadeout absolute inset-0">
-      <div className="text-[#9ca3af] absolute left-1/2 top-0 -translate-x-1/2 space-y-1 text-center font-mono text-xs tracking-wide">
-        {initialTexts.map((text, index) => (
-          <div key={index}>
-            <MatrixText isInView={isInView} text={text} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+import { motion, useReducedMotion } from 'motion/react';
 
 const BoxSvg = ({ isInView }: { isInView: boolean }) => {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <motion.svg
       initial={{ opacity: 0, y: 20 }}
       animate={{
-        opacity: isInView ? 1 : 0,
-        y: isInView ? 0 : 20,
+        opacity: prefersReducedMotion ? 1 : isInView ? 1 : 0,
+        y: prefersReducedMotion ? 0 : isInView ? 0 : 20,
       }}
-      transition={{
-        type: 'spring',
-        stiffness: 400,
-        damping: 20,
-        delay: 0.4,
-      }}
+      transition={
+        prefersReducedMotion
+          ? undefined
+          : {
+              type: 'spring',
+              stiffness: 400,
+              damping: 20,
+              delay: 0.4,
+            }
+      }
       className="relative z-10 mb-6 drop-shadow-sm"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 223 136"
@@ -115,13 +47,20 @@ const BoxSvg = ({ isInView }: { isInView: boolean }) => {
           fill="#D4D7DE"
           rx="4"
           initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: isInView ? 1 : 0, opacity: isInView ? 1 : 0 }}
-          transition={{
-            type: 'spring',
-            stiffness: 300,
-            damping: 20,
-            delay: 0.6 + i * 0.1,
+          animate={{
+            scale: prefersReducedMotion ? 1 : isInView ? 1 : 0,
+            opacity: prefersReducedMotion ? 1 : isInView ? 1 : 0,
           }}
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 20,
+                  delay: 0.6 + i * 0.1,
+                }
+          }
         />
       ))}
       <motion.rect
@@ -132,23 +71,29 @@ const BoxSvg = ({ isInView }: { isInView: boolean }) => {
         fill="#E5E7EB"
         rx="6"
         initial={{ scale: 0 }}
-        animate={{ scale: isInView ? 1 : 0 }}
-        transition={{
-          type: 'spring',
-          stiffness: 200,
-          damping: 20,
-          delay: 0.4,
-        }}
+        animate={{ scale: prefersReducedMotion ? 1 : isInView ? 1 : 0 }}
+        transition={
+          prefersReducedMotion
+            ? undefined
+            : {
+                type: 'spring',
+                stiffness: 200,
+                damping: 20,
+                delay: 0.4,
+              }
+        }
       />
       <motion.g
         initial={{ opacity: 0 }}
-        animate={{ opacity: isInView ? 1 : 0 }}
-        transition={{ delay: 1 }}
+        animate={{ opacity: prefersReducedMotion ? 1 : isInView ? 1 : 0 }}
+        transition={prefersReducedMotion ? undefined : { delay: 1 }}
       >
         <motion.g
           initial={{ clipPath: 'inset(0 100% 0 0)' }}
           animate={{ clipPath: 'inset(0 0% 0 0)' }}
-          transition={{ duration: 0.5, delay: 1 }}
+          transition={
+            prefersReducedMotion ? undefined : { duration: 0.5, delay: 1 }
+          }
         >
           <rect width="5" height="7" x="26" y="39" fill="#C5CAD3" rx="2.5" />
           <rect width="27" height="7" x="39" y="39" fill="#C5CAD3" rx="3.5" />
@@ -160,7 +105,9 @@ const BoxSvg = ({ isInView }: { isInView: boolean }) => {
         <motion.g
           initial={{ clipPath: 'inset(0 100% 0 0)' }}
           animate={{ clipPath: 'inset(0 0% 0 0)' }}
-          transition={{ duration: 0.5, delay: 1.2 }}
+          transition={
+            prefersReducedMotion ? undefined : { duration: 0.5, delay: 1.2 }
+          }
         >
           <rect width="5" height="7" x="26" y="51" fill="#C5CAD3" rx="2.5" />
           <rect width="16" height="7" x="39" y="51" fill="#C5CAD3" rx="3.5" />
@@ -185,7 +132,9 @@ const BoxSvg = ({ isInView }: { isInView: boolean }) => {
         <motion.g
           initial={{ clipPath: 'inset(0 100% 0 0)' }}
           animate={{ clipPath: 'inset(0 0% 0 0)' }}
-          transition={{ duration: 0.5, delay: 1.4 }}
+          transition={
+            prefersReducedMotion ? undefined : { duration: 0.5, delay: 1.4 }
+          }
         >
           <rect width="5" height="7" x="26" y="63" fill="#C5CAD3" rx="2.5" />
           <rect width="35" height="7" x="39" y="63" fill="#C5CAD3" rx="3.5" />
@@ -198,7 +147,9 @@ const BoxSvg = ({ isInView }: { isInView: boolean }) => {
         <motion.g
           initial={{ clipPath: 'inset(0 100% 0 0)' }}
           animate={{ clipPath: 'inset(0 0% 0 0)' }}
-          transition={{ duration: 0.5, delay: 1.6 }}
+          transition={
+            prefersReducedMotion ? undefined : { duration: 0.5, delay: 1.6 }
+          }
         >
           <rect width="5" height="7" x="26" y="75" fill="#C5CAD3" rx="2.5" />
           <rect width="12" height="7" x="39" y="75" fill="#C5CAD3" rx="3.5" />
@@ -209,7 +160,9 @@ const BoxSvg = ({ isInView }: { isInView: boolean }) => {
         <motion.g
           initial={{ clipPath: 'inset(0 100% 0 0)' }}
           animate={{ clipPath: 'inset(0 0% 0 0)' }}
-          transition={{ duration: 0.5, delay: 1.8 }}
+          transition={
+            prefersReducedMotion ? undefined : { duration: 0.5, delay: 1.8 }
+          }
         >
           <rect width="5" height="7" x="26" y="87" fill="#C5CAD3" rx="2.5" />
           <rect width="55" height="7" x="39" y="87" fill="#C5CAD3" rx="3.5" />
@@ -220,7 +173,9 @@ const BoxSvg = ({ isInView }: { isInView: boolean }) => {
         <motion.g
           initial={{ clipPath: 'inset(0 100% 0 0)' }}
           animate={{ clipPath: 'inset(0 0% 0 0)' }}
-          transition={{ duration: 0.5, delay: 2 }}
+          transition={
+            prefersReducedMotion ? undefined : { duration: 0.5, delay: 2 }
+          }
         >
           <rect width="5" height="7" x="26" y="99" fill="#C5CAD3" rx="2.5" />
           <rect width="25" height="7" x="39" y="99" fill="#C5CAD3" rx="3.5" />
@@ -233,32 +188,4 @@ const BoxSvg = ({ isInView }: { isInView: boolean }) => {
   );
 };
 
-const DeveloperFriendly = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true });
-
-  return (
-    <div
-      className="border-muted group flex flex-col overflow-clip rounded-2xl border bg-white shadow-sm max-lg:col-span-2 max-md:col-span-1"
-      ref={containerRef}
-    >
-      <div className="p-6">
-        <h3 className="mb-1 text-lg font-medium font-mono">
-          Developer friendly
-        </h3>
-        <p className="text-sm font-mono">
-          Cal.com was built by developers, for developers. Our comprehensive
-          docs and developer resources make integration a breeze
-        </p>
-      </div>
-      <div className="mt-auto flex items-center justify-center rounded-md">
-        <div className="horizontal-fadeout relative flex w-full justify-center overflow-clip">
-          <CharacterBackground isInView={isInView} />
-          <BoxSvg isInView={isInView} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export { DeveloperFriendly };
+export { BoxSvg };

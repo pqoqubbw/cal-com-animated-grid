@@ -1,12 +1,12 @@
 'use client';
 
 import {
+  useReducedMotion,
   motion,
-  type Transition,
-  useInView,
   type Variants,
+  type Transition,
 } from 'motion/react';
-import { useRef } from 'react';
+import { BottomArrow, TopArrow } from './arrow';
 
 const cornerVariants: Variants = {
   hidden: {
@@ -22,72 +22,68 @@ const cornerTransition: Transition = {
   ease: 'easeInOut',
 };
 
-const backgroundVariants = {
+const backgroundVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: {
+  visible: (prefersReducedMotion: boolean) => ({
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.68, -0.55, 0.265, 1.95],
-    },
-  },
-};
-
-const menuItemVariants = {
-  hidden: { opacity: 0, scale: 0 },
-  visible: (i: number) => ({
-    opacity: 1,
-    scale: [0, 1.1, 1],
-    transition: {
-      delay: 0.4 + i * 0.1,
-      duration: 0.3,
-      scale: {
-        times: [0, 0.7, 1],
-        ease: 'easeInOut',
-      },
-    },
+    transition: prefersReducedMotion
+      ? undefined
+      : {
+          duration: 0.5,
+          ease: [0.68, -0.55, 0.265, 1.95],
+        },
   }),
 };
 
-const boxVariants = {
+const menuItemVariants: Variants = {
+  hidden: { opacity: 0, scale: 0 },
+  visible: ({
+    count,
+    prefersReducedMotion,
+  }: {
+    count: number;
+    prefersReducedMotion: boolean;
+  }) => ({
+    opacity: 1,
+    scale: prefersReducedMotion ? 1 : [0, 1.1, 1],
+    transition: prefersReducedMotion
+      ? undefined
+      : {
+          delay: 0.4 + count * 0.1,
+          duration: 0.3,
+          scale: {
+            times: [0, 0.7, 1],
+            ease: 'easeInOut',
+          },
+        },
+  }),
+};
+
+const boxVariants: Variants = {
   hidden: { opacity: 0, pathLength: 0 },
-  visible: {
+  visible: (prefersReducedMotion: boolean) => ({
     opacity: 1,
     pathLength: 1.1,
-    transition: {
-      opacity: {
-        delay: 0.45,
-        duration: 0.2,
-      },
-      delay: 0.45,
-      duration: 0.7,
-      ease: 'easeInOut',
-    },
-  },
+    transition: prefersReducedMotion
+      ? undefined
+      : {
+          opacity: {
+            delay: 0.45,
+            duration: 0.2,
+          },
+          delay: 0.45,
+          duration: 0.7,
+          ease: 'easeInOut',
+        },
+  }),
 };
 
-const arrowLineVariants = {
-  hidden: { pathLength: 0 },
-  visible: {
-    pathLength: 1,
-    transition: {
-      delay: 1,
-      duration: 0.8,
-      ease: 'easeInOut',
-    },
-  },
-};
-
-const TranslationSvg = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true });
+const TranslationSvg = ({ isInView }: { isInView: boolean }) => {
+  const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div
-      className="relative flex w-full justify-center overflow-clip pb-6"
-      ref={containerRef}
-    >
+    <div className="relative flex w-full justify-center overflow-clip pb-6">
       <motion.svg
         className="absolute bottom-0 left-0 h-[120px] w-[80px]"
         xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +93,7 @@ const TranslationSvg = () => {
         initial="hidden"
         animate={isInView ? 'visible' : 'hidden'}
         variants={cornerVariants}
-        transition={cornerTransition}
+        transition={prefersReducedMotion ? undefined : cornerTransition}
       >
         <rect
           x="-23.5"
@@ -131,7 +127,7 @@ const TranslationSvg = () => {
         initial="hidden"
         animate={isInView ? 'visible' : 'hidden'}
         variants={cornerVariants}
-        transition={cornerTransition}
+        transition={prefersReducedMotion ? undefined : cornerTransition}
       >
         <rect
           x="-23.5"
@@ -170,11 +166,13 @@ const TranslationSvg = () => {
           fill="#fff"
           d="M4 16C4 7.163 11.163 0 20 0h154c8.837 0 16 7.163 16 16v104c0 8.837-7.163 16-16 16H20c-8.837 0-16-7.163-16-16V16Z"
           variants={backgroundVariants}
+          custom={prefersReducedMotion}
         />
         <motion.path
           stroke="#E5E7EB"
           d="M4.5 16C4.5 7.44 11.44.5 20 .5h154c8.56 0 15.5 6.94 15.5 15.5v104c0 8.56-6.94 15.5-15.5 15.5H20c-8.56 0-15.5-6.94-15.5-15.5V16Z"
           variants={backgroundVariants}
+          custom={prefersReducedMotion}
         />
 
         <motion.rect
@@ -185,7 +183,7 @@ const TranslationSvg = () => {
           fill="#E5E7EB"
           rx="4"
           variants={menuItemVariants}
-          custom={0}
+          custom={{ count: 0, prefersReducedMotion }}
         />
         <motion.rect
           width="8"
@@ -195,7 +193,7 @@ const TranslationSvg = () => {
           fill="#E5E7EB"
           rx="4"
           variants={menuItemVariants}
-          custom={1}
+          custom={{ count: 1, prefersReducedMotion }}
         />
         <motion.rect
           width="8"
@@ -205,7 +203,7 @@ const TranslationSvg = () => {
           fill="#E5E7EB"
           rx="4"
           variants={menuItemVariants}
-          custom={2}
+          custom={{ count: 2, prefersReducedMotion }}
         />
 
         <TopArrow isInView={isInView} />
@@ -219,6 +217,7 @@ const TranslationSvg = () => {
           fill="#F9FAFB"
           rx="3.5"
           variants={boxVariants}
+          custom={prefersReducedMotion}
         />
         <motion.rect
           width="47"
@@ -228,8 +227,13 @@ const TranslationSvg = () => {
           stroke="#E5E7EB"
           rx="3"
           variants={boxVariants}
+          custom={prefersReducedMotion}
           animate={
-            isInView
+            prefersReducedMotion
+              ? {
+                  stroke: '#E5E7EB',
+                }
+              : isInView
               ? {
                   stroke: ['#E5E7EB', '#292929', '#292929', '#E5E7EB'],
                   transition: {
@@ -240,7 +244,7 @@ const TranslationSvg = () => {
                     repeatDelay: 3.5,
                   },
                 }
-              : {}
+              : undefined
           }
         />
         <motion.path
@@ -266,8 +270,13 @@ const TranslationSvg = () => {
           stroke="#E5E7EB"
           rx="3.5"
           variants={boxVariants}
+          custom={prefersReducedMotion}
           animate={
-            isInView
+            prefersReducedMotion
+              ? {
+                  stroke: '#E5E7EB',
+                }
+              : isInView
               ? {
                   stroke: ['#E5E7EB', '#292929', '#292929', '#E5E7EB'],
                   transition: {
@@ -278,7 +287,7 @@ const TranslationSvg = () => {
                     repeatDelay: 3.5,
                   },
                 }
-              : {}
+              : undefined
           }
         />
         <motion.path
@@ -291,129 +300,4 @@ const TranslationSvg = () => {
   );
 };
 
-const BottomArrow = ({ isInView }: { isInView: boolean }) => {
-  const path = 'M134.5 105.5H46a6 6 0 0 1-6-6V80';
-  const width = 140;
-  const height = 110;
-
-  if (!isInView) return null;
-
-  return (
-    <svg width={width} height={height} viewBox="0 0 140 110" fill="none">
-      <motion.path
-        d={path}
-        stroke="#E5E7EB"
-        strokeWidth="1"
-        variants={arrowLineVariants}
-      />
-      <motion.path
-        d={path}
-        stroke="url(#gradient-pulse)"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <defs>
-        <motion.linearGradient
-          id="gradient-pulse"
-          gradientUnits="userSpaceOnUse"
-          initial={{
-            y1: 110,
-            y2: 126,
-            x1: 135,
-            x2: 165,
-          }}
-          animate={{
-            y1: [110, 110],
-            y2: [126, 126],
-            x1: [135, -30],
-            x2: [165, 0],
-          }}
-          transition={{
-            duration: 1.5,
-            delay: 4.9,
-            repeat: Infinity,
-            repeatDelay: 4,
-          }}
-        >
-          <stop stopColor="#1d1d20" stopOpacity="0" />
-          <stop offset="0.5" stopColor="#1d1d20" />
-          <stop offset="1" stopColor="#292929" stopOpacity="0" />
-        </motion.linearGradient>
-      </defs>
-    </svg>
-  );
-};
-
-const TopArrow = ({ isInView }: { isInView: boolean }) => {
-  const path = 'M60 56h88.5a6 6 0 0 1 6 6v19.5';
-  const width = 160;
-  const height = 80;
-
-  if (!isInView) return null;
-
-  return (
-    <svg width={width} height={height} viewBox="0 0 160 80" fill="none">
-      <motion.path
-        d={path}
-        stroke="#E5E7EB"
-        strokeWidth="1"
-        variants={arrowLineVariants}
-      />
-      <motion.path
-        d={path}
-        stroke="url(#gradient-pulse-top)"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <defs>
-        <motion.linearGradient
-          id="gradient-pulse-top"
-          gradientUnits="userSpaceOnUse"
-          initial={{
-            y1: 60,
-            y2: 80,
-            x1: -30,
-            x2: 0,
-          }}
-          animate={{
-            y1: [60, 82],
-            y2: [80, 102],
-            x1: [-30, 150],
-            x2: [0, 180],
-          }}
-          transition={{
-            duration: 1.5,
-            delay: 2,
-            repeat: Infinity,
-            repeatDelay: 4,
-          }}
-        >
-          <stop stopColor="#1d1d20" stopOpacity="0" />
-          <stop offset="0.5" stopColor="#1d1d20" />
-          <stop offset="1" stopColor="#292929" stopOpacity="0" />
-        </motion.linearGradient>
-      </defs>
-    </svg>
-  );
-};
-
-const TranslationSupport = () => {
-  return (
-    <div className="border-muted group flex flex-col overflow-clip rounded-2xl border bg-white shadow-sm">
-      <div className="p-6">
-        <h3 className="mb-1 text-lg font-medium font-mono">
-          Translation support
-        </h3>
-        <p className="text-sm font-mono">
-          Support multiple languages by passing a translations object to any Cal
-          Atom
-        </p>
-      </div>
-      <div className="mt-auto flex items-center justify-center rounded-md">
-        <TranslationSvg />
-      </div>
-    </div>
-  );
-};
-
-export { TranslationSupport };
+export { TranslationSvg };

@@ -1,16 +1,18 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useInView } from 'motion/react';
-import { useRef } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 
 const ShieldSvg = ({ isInView }: { isInView: boolean }) => {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <div className="dot-grid radial-fadeout flex w-full justify-center">
       <motion.svg
         initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        animate={
+          isInView ? { opacity: 1 } : { opacity: prefersReducedMotion ? 1 : 0 }
+        }
+        transition={prefersReducedMotion ? undefined : { duration: 0.5 }}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 245 163"
         width="245"
@@ -18,11 +20,26 @@ const ShieldSvg = ({ isInView }: { isInView: boolean }) => {
         fill="none"
       >
         <motion.g
-          initial={{ scale: 0.95, opacity: 0 }}
+          initial={{
+            scale: 0.95,
+            opacity: 0,
+          }}
           animate={
-            isInView ? { scale: 1, opacity: 1 } : { scale: 0.95, opacity: 0 }
+            isInView
+              ? { scale: 1, opacity: 1 }
+              : {
+                  scale: prefersReducedMotion ? 1 : 0.95,
+                  opacity: prefersReducedMotion ? 1 : 0,
+                }
           }
-          transition={{ delay: 0.2, duration: 0.5 }}
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  delay: 0.2,
+                  duration: 0.5,
+                }
+          }
           filter="url(#a)"
         >
           <path fill="#F9FAFB" d="M72 32h100v100H72z" />
@@ -30,8 +47,19 @@ const ShieldSvg = ({ isInView }: { isInView: boolean }) => {
 
         <motion.g
           initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
+          animate={
+            isInView
+              ? { opacity: 1 }
+              : { opacity: prefersReducedMotion ? 1 : 0 }
+          }
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  delay: 0.8,
+                  duration: 0.5,
+                }
+          }
         >
           <path stroke="url(#b)" d="M0 32h244.5" />
           <path stroke="url(#c)" d="M0 132h244.5" />
@@ -40,9 +68,26 @@ const ShieldSvg = ({ isInView }: { isInView: boolean }) => {
         </motion.g>
 
         <motion.g
-          initial={{ opacity: 0, y: -20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
+          initial={{
+            opacity: 0,
+            y: -20,
+          }}
+          animate={
+            isInView
+              ? { opacity: 1, y: 0 }
+              : {
+                  opacity: prefersReducedMotion ? 1 : 0,
+                  y: prefersReducedMotion ? 0 : -20,
+                }
+          }
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  delay: 0.8,
+                  duration: 0.5,
+                }
+          }
         >
           <rect
             width="83"
@@ -57,87 +102,166 @@ const ShieldSvg = ({ isInView }: { isInView: boolean }) => {
 
         <motion.g
           filter="url(#f)"
-          initial={{ y: -4, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : { y: -4, opacity: 0 }}
-          transition={{
-            delay: 1,
-            duration: 0.3,
-            ease: 'easeOut',
+          initial={{
+            y: -4,
+            opacity: 0,
           }}
+          animate={
+            isInView
+              ? { y: 0, opacity: 1 }
+              : {
+                  y: prefersReducedMotion ? 0 : -4,
+                  opacity: prefersReducedMotion ? 1 : 0,
+                }
+          }
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  delay: 1,
+                  duration: 0.3,
+                  ease: 'easeOut',
+                }
+          }
         >
           <circle cx="88" cy="48" r="2" fill="#E5E7EB" />
         </motion.g>
 
         <motion.g
           filter="url(#g)"
-          initial={{ x: 4, opacity: 0 }}
-          animate={isInView ? { x: 0, opacity: 1 } : { x: 4, opacity: 0 }}
-          transition={{
-            delay: 1.1,
-            duration: 0.3,
-            ease: 'easeOut',
+          initial={{
+            x: 4,
+            opacity: 0,
           }}
+          animate={
+            isInView
+              ? { x: 0, opacity: 1 }
+              : {
+                  x: prefersReducedMotion ? 0 : 4,
+                  opacity: prefersReducedMotion ? 1 : 0,
+                }
+          }
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  delay: 1.1,
+                  duration: 0.3,
+                  ease: 'easeOut',
+                }
+          }
         >
           <circle cx="156" cy="48" r="2" fill="#E5E7EB" />
         </motion.g>
 
         <motion.g
           filter="url(#i)"
-          initial={{ y: 4, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : { y: 4, opacity: 0 }}
-          transition={{
-            delay: 1.2,
-            duration: 0.3,
-            ease: 'easeOut',
+          initial={{
+            y: 4,
+            opacity: 0,
           }}
+          animate={
+            isInView
+              ? { y: 0, opacity: 1 }
+              : {
+                  y: prefersReducedMotion ? 0 : 4,
+                  opacity: prefersReducedMotion ? 1 : 0,
+                }
+          }
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  delay: 1.2,
+                  duration: 0.3,
+                  ease: 'easeOut',
+                }
+          }
         >
           <circle cx="156" cy="116" r="2" fill="#E5E7EB" />
         </motion.g>
 
         <motion.g
           filter="url(#h)"
-          initial={{ x: -4, opacity: 0 }}
-          animate={isInView ? { x: 0, opacity: 1 } : { x: -4, opacity: 0 }}
-          transition={{
-            delay: 1.3,
-            duration: 0.3,
-            ease: 'easeOut',
+          initial={{
+            x: -4,
+            opacity: 0,
           }}
+          animate={
+            isInView
+              ? { x: 0, opacity: 1 }
+              : {
+                  x: prefersReducedMotion ? 0 : -4,
+                  opacity: prefersReducedMotion ? 1 : 0,
+                }
+          }
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  delay: 1.3,
+                  duration: 0.3,
+                  ease: 'easeOut',
+                }
+          }
         >
           <circle cx="88" cy="116" r="2" fill="#E5E7EB" />
         </motion.g>
 
         <motion.g
-          initial={{ y: 20, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
-          transition={{ delay: 1, duration: 0.5, ease: 'easeOut' }}
+          initial={{
+            y: 20,
+            opacity: 0,
+          }}
+          animate={
+            isInView
+              ? { y: 0, opacity: 1 }
+              : {
+                  y: prefersReducedMotion ? 0 : 20,
+                  opacity: prefersReducedMotion ? 1 : 0,
+                }
+          }
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  delay: 1,
+                  duration: 0.5,
+                  ease: 'easeOut',
+                }
+          }
         >
           <motion.g
-            animate={
-              isInView
-                ? {
-                    scale: [1, 0.9, 1],
-                    rotate: [0, 8, -8, 0],
-                    transition: {
-                      delay: 2,
-                      duration: 0.5,
+            variants={{
+              initial: { scale: 1, rotate: 0 },
+              animate: {
+                scale: prefersReducedMotion ? 1 : [1, 0.9, 1],
+                rotate: prefersReducedMotion ? 0 : [0, 8, -8, 0],
+              },
+            }}
+            transition={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    delay: 2,
+                    duration: 0.5,
+                    repeat: Infinity,
+                    repeatDelay: 2.5,
+                    ease: 'easeInOut',
+                    repeatType: 'loop',
+                    rotate: {
+                      delay: 1.8,
                       repeat: Infinity,
                       repeatDelay: 2.5,
-                      ease: 'easeInOut',
                       repeatType: 'loop',
-                      rotate: {
-                        delay: 1.8,
-                        repeat: Infinity,
-                        repeatDelay: 2.7,
-                        repeatType: 'loop',
-                        duration: 0.4,
-                        ease: [0.34, 1.56, 0.64, 1],
-                        times: [0, 0.3, 0.7, 1],
-                      },
+                      duration: 0.4,
+                      ease: [0.34, 1.56, 0.64, 1],
+                      times: [0, 0.3, 0.7, 1],
                     },
                   }
-                : {}
             }
+            initial="initial"
+            animate={isInView ? 'animate' : 'initial'}
           >
             <g filter="url(#j)">
               <path
@@ -395,29 +519,4 @@ const ShieldSvg = ({ isInView }: { isInView: boolean }) => {
   );
 };
 
-const FullyCompliantAndSecure = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true });
-
-  return (
-    <div
-      className="border-muted group flex flex-col overflow-clip rounded-2xl border bg-white shadow-sm"
-      ref={containerRef}
-    >
-      <div className="p-6">
-        <h3 className="mb-1 text-lg font-medium font-mono">
-          Fully compliant and secure
-        </h3>
-        <p className="text-sm font-mono">
-          Cal atoms are fully compliant with standards like HIPAA, SOC2 and
-          GDPR.
-        </p>
-      </div>
-      <div className="mt-auto flex items-center justify-center rounded-md">
-        <ShieldSvg isInView={isInView} />
-      </div>
-    </div>
-  );
-};
-
-export { FullyCompliantAndSecure };
+export { ShieldSvg };
